@@ -17,7 +17,7 @@ Dense::Dense(int batch_size, int in_num, int out_num, int activation_type, float
 
     std::random_device rd;
     std::mt19937 gen(rd()) ;
-    std::normal_distribution<float> dis(0.0, 1.0);
+    std::normal_distribution<float> dis ;
 
     for (int i=0; i<out_num; i++) {
         for (int j=0; j<in_num; j++) {
@@ -43,7 +43,7 @@ Dense::~Dense()
     delete [] dZ ;
 }
 
-void Dense::Forward(float *input) {
+void Dense::Forward(const float *input) {
     float net ;
 
     // calculate forward pass
@@ -66,7 +66,7 @@ void Dense::Forward(float *input) {
     }
 }
 
-void Dense::Backprop(float *dA) {
+void Dense::Backprop(const float *dA) {
     // dL/dZ
     activation_backprop(dA) ;
 
@@ -101,7 +101,16 @@ void Dense::Backprop(float *dA) {
     }
 }
 
-void Dense::activation_backprop(float *dA) {
+void Dense::Update_params() {
+    for (int i=0; i<out_num; i++) {
+        for (int j=0; j<in_num; j++) {
+            weights[i*in_num+j] -= lr*dW[i*in_num+j] ;
+        }
+        bias[i] -= lr*db[i] ;
+    }
+}
+
+void Dense::activation_backprop(const float *dA) {
     // dL/dZ = dL/dA * dA/dZ
     if (activation_type == 0) { // relu
         for (int i=0; i<batch_size; i++) {
@@ -164,6 +173,7 @@ void Dense::PrintAllInstance() {
     for (int i=0; i<out_num; i++) {
         std::cout << bias[i] << " " ;
     }
+    std::cout << std::endl ;
 
     std::cout << std::endl << "Z: " << std::endl ;
     for (int i=0; i<batch_size; i++) {
@@ -191,7 +201,7 @@ void Dense::PrintAllInstance() {
 
 
 
-    std::cout << "dW: " << std::endl ;
+    std::cout << std::endl << "dW: " << std::endl ;
     for (int i=0; i<out_num; i++) {
         for (int j=0; j<in_num; j++) {
             std::cout << dW[i*in_num+j] << " " ;
@@ -203,6 +213,7 @@ void Dense::PrintAllInstance() {
     for (int i=0; i<out_num; i++) {
         std::cout << db[i] << " " ;
     }
+    std::cout << std::endl ;
 
     std::cout << std::endl << "dZ: " << std::endl ;
     for (int i=0; i<batch_size; i++) {
@@ -220,4 +231,16 @@ void Dense::PrintAllInstance() {
         std::cout << std::endl ;
     }
 
+}
+
+const float* Dense::Get_A() {
+    return this->A ;
+}
+
+const float* Dense::Get_dAPrev() {
+    return this->dA_prev ;
+}
+
+int Dense::Get_out_num() {
+    return this->out_num ;
 }

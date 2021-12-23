@@ -24,18 +24,30 @@ private:
     // idx: #row to cal
     void cal_activation(int idx) ;
 
-    void activation_backprop(float *dA) ;
+    void activation_backprop(const float *dA) ;
 public:
     Dense(int batch_size, int in_num, int out_num, int activation_type, float learning_rate = 0.001);
     ~Dense();
 
     // input: #batch_size * #dimension(in_num)
-    void Forward(float *input) ; 
+    void Forward(const float *input) ; 
     
     // if this is last layer, arg is Y, if not, is dA. 
     // dA: #batch_size * #out_num 
-    void Backprop(float *dA) ;
+    void Backprop(const float *dA) ;
+
+    //
+    void Update_params() ;
 
     // for debug
     void PrintAllInstance() ;    
+
+    // return float *A 
+    const float* Get_A() ;
+
+    // return float *dA_prev 
+    const float* Get_dAPrev() ;
+
+    // return out_num
+    int Get_out_num() ;
 };
