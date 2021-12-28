@@ -77,6 +77,8 @@ void read_label(string path, float *arr) {
 
 int main(int argc, char *argv[]) {
     // get data
+    chrono::steady_clock::time_point t_io_start = chrono::steady_clock::now();
+
     string x_train_path = "../mnist/train-images-idx3-ubyte" ;
     string y_train_path = "../mnist/train-labels-idx1-ubyte" ;
     string x_test_path = "../mnist/t10k-images-idx3-ubyte" ;
@@ -91,6 +93,9 @@ int main(int argc, char *argv[]) {
     read_label(y_train_path, y_train) ;
     read_mnist(x_test_path, X_test) ;
     read_label(y_test_path, y_test) ;
+
+    chrono::steady_clock::time_point t_io_end = chrono::steady_clock::now();
+    cout << "Read mnist take " << chrono::duration_cast<chrono::milliseconds>(t_io_end - t_io_start).count() << " ms.\n";
 
     // cout << "Read: " << std::fixed << endl ;
 
@@ -116,6 +121,8 @@ int main(int argc, char *argv[]) {
     // cout << endl ;
 
     // build model, 784->128->10
+    chrono::steady_clock::time_point t_cal_start = chrono::steady_clock::now();
+
     int layer_dims[3] {784, 128, 10} ;
     int batch_size = 100 ;
     Model model(layer_dims, 2, batch_size, 0.05) ;
@@ -133,6 +140,9 @@ int main(int argc, char *argv[]) {
 
     // result
     cout << "Final Test Accuracy: " << model.Evaluate(X_test, y_test, 10000/batch_size) << endl ;
+
+    chrono::steady_clock::time_point t_cal_end = chrono::steady_clock::now();
+    cout << "Train take " << chrono::duration_cast<chrono::seconds>(t_cal_end - t_cal_start).count() << " s.\n";
 
     delete [] X_train ;
     delete [] y_train ;
